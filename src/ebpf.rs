@@ -22,7 +22,7 @@ use byteorder::{ByteOrder, LittleEndian};
 use hash32::{Hash, Hasher, Murmur3Hasher};
 use std::fmt;
 
-/// Solana BPF version flag
+/// Trezoa BPF version flag
 pub const EF_SBPF_V2: u32 = 0x20;
 /// Maximum number of instructions in an eBPF program.
 pub const PROG_MAX_INSNS: usize = 65_536;
@@ -531,7 +531,7 @@ impl Insn {
     /// # Examples
     ///
     /// ```
-    /// use solana_rbpf::ebpf;
+    /// use trezoa_rbpf::ebpf;
     ///
     /// let prog: &[u8] = &[
     ///     0xb7, 0x12, 0x56, 0x34, 0xde, 0xbc, 0x9a, 0x78,
@@ -564,7 +564,7 @@ impl Insn {
     /// # Examples
     ///
     /// ```
-    /// use solana_rbpf::ebpf;
+    /// use trezoa_rbpf::ebpf;
     ///
     /// let prog: Vec<u8> = vec![
     ///     0xb7, 0x12, 0x56, 0x34, 0xde, 0xbc, 0x9a, 0x78,
@@ -595,7 +595,7 @@ impl Insn {
 /// # Examples
 ///
 /// ```
-/// use solana_rbpf::ebpf;
+/// use trezoa_rbpf::ebpf;
 ///
 /// let prog = &[
 ///     0xb7, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -608,7 +608,7 @@ impl Insn {
 /// The example below will panic, since the last instruction is not complete and cannot be loaded.
 ///
 /// ```rust,should_panic
-/// use solana_rbpf::ebpf;
+/// use trezoa_rbpf::ebpf;
 ///
 /// let prog = &[
 ///     0xb7, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,

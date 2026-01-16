@@ -1,10 +1,10 @@
 #!/bin/bash -ex
 
-# Requires Latest release of Solana's custom LLVM
-# https://github.com/solana-labs/platform-tools/releases
+# Requires Latest release of Trezoa's custom LLVM
+# https://github.com/trezoa-labs/platform-tools/releases
 
 TOOLCHAIN=../../../agave/sdk/sbf/dependencies/platform-tools
-RC_COMMON="$TOOLCHAIN/rust/bin/rustc --target sbf-solana-solana --crate-type lib -C panic=abort -C opt-level=2"
+RC_COMMON="$TOOLCHAIN/rust/bin/rustc --target sbf-trezoa-trezoa --crate-type lib -C panic=abort -C opt-level=2"
 RC="$RC_COMMON -C target_cpu=sbfv2"
 RC_V1="$RC_COMMON -C target_cpu=generic"
 LD_COMMON="$TOOLCHAIN/llvm/bin/ld.lld -z notext -shared --Bdynamic -entry entrypoint"

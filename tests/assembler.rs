@@ -5,12 +5,12 @@
 // the MIT license <http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-extern crate solana_rbpf;
+extern crate trezoa_rbpf;
 extern crate test_utils;
 
-use solana_rbpf::program::{FunctionRegistry, SBPFVersion};
-use solana_rbpf::vm::Config;
-use solana_rbpf::{assembler::assemble, ebpf, program::BuiltinProgram, vm::TestContextObject};
+use trezoa_rbpf::program::{FunctionRegistry, SBPFVersion};
+use trezoa_rbpf::vm::Config;
+use trezoa_rbpf::{assembler::assemble, ebpf, program::BuiltinProgram, vm::TestContextObject};
 use std::sync::Arc;
 use test_utils::{TCP_SACK_ASM, TCP_SACK_BIN};
 

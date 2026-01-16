@@ -1,4 +1,4 @@
-// Copyright 2020 Solana Maintainers <maintainers@solana.com>
+// Copyright 2020 Trezoa Maintainers <maintainers@trezoa.com>
 //
 // Licensed under the Apache License, Version 2.0 <http://www.apache.org/licenses/LICENSE-2.0> or
 // the MIT license <http://opensource.org/licenses/MIT>, at your option. This file may not be
@@ -6,17 +6,17 @@
 
 #![feature(test)]
 
-extern crate solana_rbpf;
+extern crate trezoa_rbpf;
 extern crate test;
 
 #[cfg(all(feature = "jit", not(target_os = "windows"), target_arch = "x86_64"))]
-use solana_rbpf::{
+use trezoa_rbpf::{
     ebpf,
     memory_region::MemoryRegion,
     program::{FunctionRegistry, SBPFVersion},
     vm::Config,
 };
-use solana_rbpf::{
+use trezoa_rbpf::{
     elf::Executable, program::BuiltinProgram, verifier::RequisiteVerifier, vm::TestContextObject,
 };
 use std::{fs::File, io::Read, sync::Arc};
@@ -83,7 +83,7 @@ fn bench_jit_vs_interpreter(
     instruction_meter: u64,
     mem: &mut [u8],
 ) {
-    let mut executable = solana_rbpf::assembler::assemble::<TestContextObject>(
+    let mut executable = trezoa_rbpf::assembler::assemble::<TestContextObject>(
         assembly,
         Arc::new(BuiltinProgram::new_loader(
             config,

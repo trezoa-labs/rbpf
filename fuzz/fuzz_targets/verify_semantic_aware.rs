@@ -3,7 +3,7 @@
 use libfuzzer_sys::fuzz_target;
 
 use semantic_aware::*;
-use solana_rbpf::{
+use trezoa_rbpf::{
     insn_builder::IntoBytes,
     program::{BuiltinFunction, FunctionRegistry, SBPFVersion},
     verifier::{RequisiteVerifier, Verifier},

@@ -10,8 +10,8 @@ extern crate json;
 extern crate elf;
 use std::path::PathBuf;
 
-extern crate solana_rbpf;
-use solana_rbpf::{
+extern crate trezoa_rbpf;
+use trezoa_rbpf::{
     elf::Executable,
     program::{BuiltinProgram, FunctionRegistry, SBPFVersion},
     static_analysis::Analysis,

@@ -4,7 +4,7 @@
 //      (uBPF: safety checks, originally in C)
 // Copyright 2016 6WIND S.A. <quentin.monnet@6wind.com>
 //      (Translation to Rust)
-// Copyright 2020 Solana Maintainers <maintainers@solana.com>
+// Copyright 2020 Trezoa Maintainers <maintainers@trezoa.com>
 //
 // Licensed under the Apache License, Version 2.0 <http://www.apache.org/licenses/LICENSE-2.0> or
 // the MIT license <http://opensource.org/licenses/MIT>, at your option. This file may not be
@@ -233,7 +233,7 @@ fn check_callx_register(
     Ok(())
 }
 
-/// Mandatory verifier for solana programs to run on-chain
+/// Mandatory verifier for trezoa programs to run on-chain
 #[derive(Debug)]
 pub struct RequisiteVerifier {}
 impl Verifier for RequisiteVerifier {

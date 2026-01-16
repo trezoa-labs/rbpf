@@ -1244,7 +1244,7 @@ impl<C: ContextObject> Executable<C> {
                             refd_addr
                         } else {
                             // There used to be a bug in toolchains before
-                            // https://github.com/solana-labs/llvm-project/pull/35 where for 64 bit
+                            // https://github.com/trezoa-labs/llvm-project/pull/35 where for 64 bit
                             // relocations we were encoding only the low 32 bits, shifted 32 bits to
                             // the left. Our relocation code used to be compatible with that, so we
                             // need to keep supporting this case for backwards compatibility.

@@ -2,13 +2,13 @@
 name = "rbpf_cli"
 version = "0.8.2"
 description = "CLI to test and analyze eBPF programs"
-authors = ["Solana Maintainers <maintainers@solana.foundation>"]
-repository = "https://github.com/solana-labs/rbpf"
-homepage = "https://solana.com/"
+authors = ["Trezoa Maintainers <maintainers@trezoa.foundation>"]
+repository = "https://github.com/trezoa-labs/rbpf"
+homepage = "https://trezoa.com/"
 keywords = ["BPF", "eBPF", "interpreter", "JIT"]
 edition = "2018"
 
 [dependencies]
-solana_rbpf = { path = "../", features = ["debugger"] }
+trezoa_rbpf = { path = "../", features = ["debugger"] }
 test_utils = { path = "../test_utils/" }
 clap = "3.0.0-beta.2"

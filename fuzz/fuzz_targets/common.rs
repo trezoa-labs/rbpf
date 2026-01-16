@@ -2,7 +2,7 @@ use std::mem::size_of;
 
 use arbitrary::{Arbitrary, Unstructured};
 
-use solana_rbpf::vm::Config;
+use trezoa_rbpf::vm::Config;
 
 #[derive(Debug)]
 pub struct ConfigTemplate {

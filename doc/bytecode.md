@@ -6,7 +6,7 @@ Registers
 The VM has 12 registers, including 10 general-purpose registers (GPRs).
 All of them are 64 bit wide.
 
-|  name | feature set | kind            | Solana ABI                        
+|  name | feature set | kind            | Trezoa ABI                        
 |------:|:------------|:----------------|:----------
 |  `r0` | all         | GPR             | Return value                      
 |  `r1` | all         | GPR             | Argument 0                        

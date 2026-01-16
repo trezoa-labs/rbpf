@@ -1,6 +1,6 @@
 #![allow(clippy::arithmetic_side_effects)]
 #![cfg(all(feature = "jit", not(target_os = "windows"), target_arch = "x86_64"))]
-// Copyright 2020 Solana Maintainers <maintainers@solana.com>
+// Copyright 2020 Trezoa Maintainers <maintainers@trezoa.com>
 //
 // Licensed under the Apache License, Version 2.0 <http://www.apache.org/licenses/LICENSE-2.0> or
 // the MIT license <http://opensource.org/licenses/MIT>, at your option. This file may not be
@@ -8,14 +8,14 @@
 
 extern crate byteorder;
 extern crate libc;
-extern crate solana_rbpf;
+extern crate trezoa_rbpf;
 extern crate test_utils;
 extern crate thiserror;
 
 use byteorder::{ByteOrder, LittleEndian};
 #[cfg(all(not(windows), target_arch = "x86_64"))]
 use rand::{rngs::SmallRng, RngCore, SeedableRng};
-use solana_rbpf::{
+use trezoa_rbpf::{
     assembler::assemble,
     declare_builtin_function, ebpf,
     elf::Executable,
@@ -3096,7 +3096,7 @@ fn test_reloc_64_relative_data_sbfv1() {
 
 #[test]
 fn test_reloc_64_relative_data_sbpfv0() {
-    // Before https://github.com/solana-labs/llvm-project/pull/35, we used to
+    // Before https://github.com/trezoa-labs/llvm-project/pull/35, we used to
     // generate invalid R_BPF_64_RELATIVE relocations in sections other than
     // .text.
     //
@@ -3435,7 +3435,7 @@ fn execute_generated_program(prog: &[u8]) -> bool {
         || !TestContextObject::compare_trace_log(&tracer_interpreter, tracer_jit)
     {
         let analysis =
-            solana_rbpf::static_analysis::Analysis::from_executable(&executable).unwrap();
+            trezoa_rbpf::static_analysis::Analysis::from_executable(&executable).unwrap();
         println!("result_interpreter={result_interpreter:?}");
         println!("result_jit={result_jit:?}");
         let stdout = std::io::stdout();

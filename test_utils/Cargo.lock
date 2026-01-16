@@ -153,7 +153,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "04c565b551bafbef4157586fa379538366e4385d42082f255bfd96e4fe8519da"
 
 [[package]]
-name = "solana_rbpf"
+name = "trezoa_rbpf"
 version = "0.8.2"
 dependencies = [
  "byteorder",
@@ -184,7 +184,7 @@ name = "test_utils"
 version = "0.8.2"
 dependencies = [
  "libc",
- "solana_rbpf",
+ "trezoa_rbpf",
 ]
 
 [[package]]

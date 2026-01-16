@@ -1,6 +1,6 @@
 #![allow(clippy::arithmetic_side_effects)]
 #![cfg(all(feature = "jit", not(target_os = "windows"), target_arch = "x86_64"))]
-// Copyright 2020 Solana Maintainers <maintainers@solana.com>
+// Copyright 2020 Trezoa Maintainers <maintainers@trezoa.com>
 //
 // Licensed under the Apache License, Version 2.0 <http://www.apache.org/licenses/LICENSE-2.0> or
 // the MIT license <http://opensource.org/licenses/MIT>, at your option. This file may not be
@@ -8,12 +8,12 @@
 
 extern crate byteorder;
 extern crate libc;
-extern crate solana_rbpf;
+extern crate trezoa_rbpf;
 extern crate test_utils;
 extern crate thiserror;
 
 use rand::{rngs::SmallRng, RngCore, SeedableRng};
-use solana_rbpf::{
+use trezoa_rbpf::{
     assembler::assemble,
     ebpf,
     memory_region::MemoryRegion,

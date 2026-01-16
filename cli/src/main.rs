@@ -1,5 +1,5 @@
 use clap::{crate_version, App, Arg};
-use solana_rbpf::{
+use trezoa_rbpf::{
     aligned_memory::AlignedMemory,
     assembler::assemble,
     ebpf,
@@ -13,13 +13,13 @@ use solana_rbpf::{
 use std::{fs::File, io::Read, path::Path, sync::Arc};
 
 fn main() {
-    let matches = App::new("Solana BPF CLI")
+    let matches = App::new("Trezoa BPF CLI")
         .version(crate_version!())
-        .author("Solana Maintainers <maintainers@solana.foundation>")
-        .about("CLI to test and analyze Solana BPF programs")
+        .author("Trezoa Maintainers <maintainers@trezoa.foundation>")
+        .about("CLI to test and analyze Trezoa BPF programs")
         .arg(
             Arg::new("assembler")
-                .about("Assemble and load Solana BPF executable")
+                .about("Assemble and load Trezoa BPF executable")
                 .short('a')
                 .long("asm")
                 .value_name("FILE")
@@ -28,7 +28,7 @@ fn main() {
         )
         .arg(
             Arg::new("elf")
-                .about("Load ELF as Solana BPF executable")
+                .about("Load ELF as Trezoa BPF executable")
                 .short('e')
                 .long("elf")
                 .value_name("FILE")

@@ -1,10 +1,10 @@
 [package]
-name = "solana_rbpf"
+name = "trezoa_rbpf"
 version = "0.8.2"
 description = "Virtual machine and JIT compiler for eBPF programs"
-authors = ["Solana Maintainers <maintainers@solana.foundation>"]
-repository = "https://github.com/solana-labs/rbpf"
-homepage = "https://solana.com/"
+authors = ["Trezoa Maintainers <maintainers@trezoa.foundation>"]
+repository = "https://github.com/trezoa-labs/rbpf"
+homepage = "https://trezoa.com/"
 keywords = ["BPF", "eBPF", "interpreter", "JIT", "filtering"]
 license = "Apache-2.0"
 edition = "2018"
