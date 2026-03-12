@@ -8,13 +8,17 @@
 
 extern crate byteorder;
 extern crate libc;
-extern crate trezoa_rbpf;
 extern crate test_utils;
 extern crate thiserror;
+extern crate trezoa_rbpf;
 
 use byteorder::{ByteOrder, LittleEndian};
 #[cfg(all(not(windows), target_arch = "x86_64"))]
 use rand::{rngs::SmallRng, RngCore, SeedableRng};
+use std::{fs::File, io::Read, sync::Arc};
+use test_utils::{
+    assert_error, create_vm, PROG_TCP_PORT_80, TCP_SACK_ASM, TCP_SACK_MATCH, TCP_SACK_NOMATCH,
+};
 use trezoa_rbpf::{
     assembler::assemble,
     declare_builtin_function, ebpf,
@@ -26,10 +30,6 @@ use trezoa_rbpf::{
     syscalls,
     verifier::RequisiteVerifier,
     vm::{Config, ContextObject, TestContextObject},
-};
-use std::{fs::File, io::Read, sync::Arc};
-use test_utils::{
-    assert_error, create_vm, PROG_TCP_PORT_80, TCP_SACK_ASM, TCP_SACK_MATCH, TCP_SACK_NOMATCH,
 };
 
 const INSTRUCTION_METER_BUDGET: u64 = 1024;

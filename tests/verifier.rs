@@ -19,9 +19,12 @@
 
 // These are unit tests for the eBPF “verifier”.
 
-extern crate trezoa_rbpf;
 extern crate thiserror;
+extern crate trezoa_rbpf;
 
+use std::sync::Arc;
+use test_utils::{assert_error, create_vm};
+use thiserror::Error;
 use trezoa_rbpf::{
     assembler::assemble,
     ebpf,
@@ -31,9 +34,6 @@ use trezoa_rbpf::{
     verifier::{RequisiteVerifier, Verifier, VerifierError},
     vm::{Config, ContextObject, TestContextObject},
 };
-use std::sync::Arc;
-use test_utils::{assert_error, create_vm};
-use thiserror::Error;
 
 /// Error definitions
 #[derive(Debug, Error)]

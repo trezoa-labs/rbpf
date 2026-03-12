@@ -6,9 +6,12 @@
 
 #![feature(test)]
 
-extern crate trezoa_rbpf;
 extern crate test;
+extern crate trezoa_rbpf;
 
+use std::{fs::File, io::Read, sync::Arc};
+use test::Bencher;
+use test_utils::create_vm;
 #[cfg(all(feature = "jit", not(target_os = "windows"), target_arch = "x86_64"))]
 use trezoa_rbpf::{
     ebpf,
@@ -19,9 +22,6 @@ use trezoa_rbpf::{
 use trezoa_rbpf::{
     elf::Executable, program::BuiltinProgram, verifier::RequisiteVerifier, vm::TestContextObject,
 };
-use std::{fs::File, io::Read, sync::Arc};
-use test::Bencher;
-use test_utils::create_vm;
 
 #[bench]
 fn bench_init_interpreter_start(bencher: &mut Bencher) {

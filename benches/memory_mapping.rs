@@ -7,10 +7,11 @@
 #![feature(test)]
 
 extern crate rand;
-extern crate trezoa_rbpf;
 extern crate test;
+extern crate trezoa_rbpf;
 
 use rand::{rngs::SmallRng, Rng, SeedableRng};
+use test::Bencher;
 use trezoa_rbpf::{
     memory_region::{
         AccessType, AlignedMemoryMapping, MemoryRegion, MemoryState, UnalignedMemoryMapping,
@@ -18,7 +19,6 @@ use trezoa_rbpf::{
     program::SBPFVersion,
     vm::Config,
 };
-use test::Bencher;
 
 fn generate_memory_regions(
     entries: usize,

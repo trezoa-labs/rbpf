@@ -8,11 +8,13 @@
 
 extern crate byteorder;
 extern crate libc;
-extern crate trezoa_rbpf;
 extern crate test_utils;
 extern crate thiserror;
+extern crate trezoa_rbpf;
 
 use rand::{rngs::SmallRng, RngCore, SeedableRng};
+use std::sync::Arc;
+use test_utils::create_vm;
 use trezoa_rbpf::{
     assembler::assemble,
     ebpf,
@@ -22,8 +24,6 @@ use trezoa_rbpf::{
     verifier::RequisiteVerifier,
     vm::{Config, ContextObject, TestContextObject},
 };
-use std::sync::Arc;
-use test_utils::create_vm;
 
 macro_rules! test_interpreter_and_jit {
     (register, $function_registry:expr, $location:expr => $syscall_function:expr) => {

@@ -6,18 +6,18 @@
 
 #![feature(test)]
 
-extern crate trezoa_rbpf;
 extern crate test;
 extern crate test_utils;
+extern crate trezoa_rbpf;
 
+use std::{fs::File, io::Read, sync::Arc};
+use test::Bencher;
 use trezoa_rbpf::{
     elf::Executable,
     program::{BuiltinFunction, BuiltinProgram, FunctionRegistry},
     syscalls,
     vm::{Config, TestContextObject},
 };
-use std::{fs::File, io::Read, sync::Arc};
-use test::Bencher;
 
 fn loader() -> Arc<BuiltinProgram<TestContextObject>> {
     let mut function_registry = FunctionRegistry::<BuiltinFunction<TestContextObject>>::default();

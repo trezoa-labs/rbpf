@@ -6,15 +6,15 @@
 
 #![feature(test)]
 
-extern crate trezoa_rbpf;
 extern crate test;
+extern crate trezoa_rbpf;
 
-use trezoa_rbpf::{
-    elf::Executable, program::BuiltinProgram, verifier::RequisiteVerifier, vm::TestContextObject,
-};
 use std::{fs::File, io::Read, sync::Arc};
 use test::Bencher;
 use test_utils::create_vm;
+use trezoa_rbpf::{
+    elf::Executable, program::BuiltinProgram, verifier::RequisiteVerifier, vm::TestContextObject,
+};
 
 #[bench]
 fn bench_init_vm(bencher: &mut Bencher) {

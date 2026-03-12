@@ -11,13 +11,13 @@ extern crate elf;
 use std::path::PathBuf;
 
 extern crate trezoa_rbpf;
+use std::sync::Arc;
 use trezoa_rbpf::{
     elf::Executable,
     program::{BuiltinProgram, FunctionRegistry, SBPFVersion},
     static_analysis::Analysis,
     vm::TestContextObject,
 };
-use std::sync::Arc;
 // Turn a program into a JSON string.
 //
 // Relies on `json` crate.

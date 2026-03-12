@@ -5,13 +5,13 @@
 // copied, modified, or distributed except according to those terms.
 
 extern crate trezoa_rbpf;
+use std::sync::Arc;
 use trezoa_rbpf::{
     elf::Executable,
     program::{BuiltinProgram, FunctionRegistry, SBPFVersion},
     static_analysis::Analysis,
     vm::TestContextObject,
 };
-use std::sync::Arc;
 
 // Simply disassemble a program into human-readable instructions.
 fn main() {

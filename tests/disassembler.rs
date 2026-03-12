@@ -7,6 +7,7 @@
 // copied, modified, or distributed except according to those terms.
 
 extern crate trezoa_rbpf;
+use std::sync::Arc;
 use trezoa_rbpf::program::SBPFVersion;
 use trezoa_rbpf::{
     assembler::assemble,
@@ -14,7 +15,6 @@ use trezoa_rbpf::{
     static_analysis::Analysis,
     vm::{Config, TestContextObject},
 };
-use std::sync::Arc;
 
 // Using a macro to keep actual line numbers in failure output
 macro_rules! disasm {

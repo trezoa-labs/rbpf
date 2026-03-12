@@ -159,7 +159,7 @@ fn get_host_ptr<C: ContextObject>(
         .enable_lower_bytecode_vaddr()
         && vm_addr < ebpf::MM_RODATA_START
     {
-        vm_addr += ebpf::MM_RODATA_START;
+        vm_addr = vm_addr.wrapping_add(ebpf::MM_RODATA_START);
     }
     match interpreter.vm.memory_mapping.map(
         AccessType::Load,
@@ -382,8 +382,8 @@ impl<'a, 'b, C: ContextObject> target::ext::lldb_register_info_override::LldbReg
                 let reg = Register {
                     name: &name,
                     alt_name: None,
-                    bitsize: (usize::from(size)) * 8,
-                    offset: reg_id * (usize::from(size)),
+                    bitsize: (usize::from(size)).wrapping_mul(8),
+                    offset: reg_id.wrapping_mul(usize::from(size)),
                     encoding: Encoding::Uint,
                     format: Format::Hex,
                     set: &set,

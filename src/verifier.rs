@@ -101,7 +101,7 @@ pub trait Verifier {
 }
 
 fn check_prog_len(prog: &[u8]) -> Result<(), VerifierError> {
-    if prog.len() % ebpf::INSN_SIZE != 0 {
+    if !prog.len().is_multiple_of(ebpf::INSN_SIZE) {
         return Err(VerifierError::ProgramLengthNotMultiple);
     }
     if prog.is_empty() {
