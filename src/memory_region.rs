@@ -729,7 +729,12 @@ impl<'a> AlignedMemoryMapping<'a> {
 /// Maps virtual memory to host memory.
 #[derive(Debug)]
 pub enum MemoryMapping<'a> {
-    /// Used when address translation is disabled
+    /// Used when address translation is disabled.
+    ///
+    /// No bounds checking occurs in this mode: VM addresses are treated as raw
+    /// host pointers. This is intended only for trusted execution environments
+    /// that provide their own memory isolation, and is not safe for untrusted
+    /// programs.
     Identity,
     /// Aligned memory mapping which uses the upper half of an address to
     /// identify the underlying memory region.

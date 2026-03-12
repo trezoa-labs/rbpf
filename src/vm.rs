@@ -314,6 +314,13 @@ pub struct EbpfVm<'a, C: ContextObject> {
 
 impl<'a, C: ContextObject> EbpfVm<'a, C> {
     /// Creates a new virtual machine instance.
+    ///
+    /// # Safety / Security
+    ///
+    /// `config.enable_address_translation` **must** be `true` when running untrusted programs
+    /// (e.g. on-chain validator context).  When it is `false`, all memory accesses bypass
+    /// bounds-checking entirely and treat the guest virtual address as a raw host pointer,
+    /// allowing arbitrary host memory reads/writes.
     pub fn new(
         loader: Arc<BuiltinProgram<C>>,
         sbpf_version: SBPFVersion,
@@ -322,6 +329,11 @@ impl<'a, C: ContextObject> EbpfVm<'a, C> {
         stack_len: usize,
     ) -> Self {
         let config = loader.get_config();
+        debug_assert!(
+            config.enable_address_translation,
+            "enable_address_translation must be true for untrusted programs; \
+             disabling it bypasses all memory bounds checks"
+        );
         let mut registers = [0u64; 12];
         registers[ebpf::FRAME_PTR_REG] =
             ebpf::MM_STACK_START.saturating_add(if sbpf_version.dynamic_stack_frames() {
@@ -331,6 +343,16 @@ impl<'a, C: ContextObject> EbpfVm<'a, C> {
                 // within a frame the stack grows down, but frames are ascending
                 config.stack_frame_size
             } as u64);
+        // SECURITY NOTE:
+        //
+        // Disabling address translation switches the VM into Identity memory mapping.
+        // In this mode VM addresses are treated as host pointers without bounds checks.
+        //
+        // This mode is intended only for trusted embedders that provide their own
+        // memory isolation. It must never be used when executing untrusted programs
+        // (such as validator or on-chain execution environments).
+        //
+        // The default configuration keeps address translation enabled.
         if !config.enable_address_translation {
             memory_mapping = MemoryMapping::new_identity();
         }
