@@ -4,13 +4,8 @@
 // the MIT license <http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-#![feature(test)]
-
-extern crate test;
-extern crate trezoa_rbpf;
-
+use criterion::{criterion_group, criterion_main, Criterion};
 use std::{fs::File, io::Read, sync::Arc};
-use test::Bencher;
 use test_utils::create_vm;
 #[cfg(all(feature = "jit", not(target_os = "windows"), target_arch = "x86_64"))]
 use trezoa_rbpf::{
@@ -23,8 +18,7 @@ use trezoa_rbpf::{
     elf::Executable, program::BuiltinProgram, verifier::RequisiteVerifier, vm::TestContextObject,
 };
 
-#[bench]
-fn bench_init_interpreter_start(bencher: &mut Bencher) {
+fn bench_init_interpreter_start(c: &mut Criterion) {
     let mut file = File::open("tests/elfs/rodata_section_sbpfv0.so").unwrap();
     let mut elf = Vec::new();
     file.read_to_end(&mut elf).unwrap();
@@ -42,15 +36,16 @@ fn bench_init_interpreter_start(bencher: &mut Bencher) {
         Vec::new(),
         None
     );
-    bencher.iter(|| {
-        vm.context_object_pointer.remaining = 37;
-        vm.execute_program(&executable, true).1.unwrap()
+    c.bench_function("init_interpreter_start", |b| {
+        b.iter(|| {
+            vm.context_object_pointer.remaining = 37;
+            vm.execute_program(&executable, true).1.unwrap()
+        })
     });
 }
 
 #[cfg(all(feature = "jit", not(target_os = "windows"), target_arch = "x86_64"))]
-#[bench]
-fn bench_init_jit_start(bencher: &mut Bencher) {
+fn bench_init_jit_start(c: &mut Criterion) {
     let mut file = File::open("tests/elfs/rodata_section_sbpfv0.so").unwrap();
     let mut elf = Vec::new();
     file.read_to_end(&mut elf).unwrap();
@@ -69,19 +64,22 @@ fn bench_init_jit_start(bencher: &mut Bencher) {
         Vec::new(),
         None
     );
-    bencher.iter(|| {
-        vm.context_object_pointer.remaining = 37;
-        vm.execute_program(&executable, false).1.unwrap()
+    c.bench_function("init_jit_start", |b| {
+        b.iter(|| {
+            vm.context_object_pointer.remaining = 37;
+            vm.execute_program(&executable, false).1.unwrap()
+        })
     });
 }
 
 #[cfg(all(feature = "jit", not(target_os = "windows"), target_arch = "x86_64"))]
 fn bench_jit_vs_interpreter(
-    bencher: &mut Bencher,
+    c: &mut Criterion,
+    group_name: &str,
     assembly: &str,
     config: Config,
     instruction_meter: u64,
-    mem: &mut [u8],
+    mem_size: usize,
 ) {
     let mut executable = trezoa_rbpf::assembler::assemble::<TestContextObject>(
         assembly,
@@ -93,52 +91,63 @@ fn bench_jit_vs_interpreter(
     .unwrap();
     executable.verify::<RequisiteVerifier>().unwrap();
     executable.jit_compile().unwrap();
-    let mut context_object = TestContextObject::default();
-    let mem_region = MemoryRegion::new_writable(mem, ebpf::MM_INPUT_START);
-    create_vm!(
-        vm,
-        &executable,
-        &mut context_object,
-        stack,
-        heap,
-        vec![mem_region],
-        None
-    );
-    let interpreter_summary = bencher
-        .bench(|bencher| {
-            bencher.iter(|| {
+
+    let mut group = c.benchmark_group(group_name);
+
+    {
+        let mut context_object = TestContextObject::default();
+        let mut mem = vec![0u8; mem_size];
+        let mem_region = MemoryRegion::new_writable(&mut mem, ebpf::MM_INPUT_START);
+        create_vm!(
+            vm,
+            &executable,
+            &mut context_object,
+            stack,
+            heap,
+            vec![mem_region],
+            None
+        );
+        group.bench_function("interpreter", |b| {
+            b.iter(|| {
                 vm.context_object_pointer.remaining = instruction_meter;
-                let (instruction_count_interpreter, result) = vm.execute_program(&executable, true);
+                let (count, result) = vm.execute_program(&executable, true);
                 assert!(result.is_ok(), "{:?}", result);
-                assert_eq!(instruction_count_interpreter, instruction_meter);
-            });
-            Ok(())
-        })
-        .unwrap()
-        .unwrap();
-    let jit_summary = bencher
-        .bench(|bencher| {
-            bencher.iter(|| {
+                assert_eq!(count, instruction_meter);
+            })
+        });
+    }
+
+    {
+        let mut context_object = TestContextObject::default();
+        let mut mem = vec![0u8; mem_size];
+        let mem_region = MemoryRegion::new_writable(&mut mem, ebpf::MM_INPUT_START);
+        create_vm!(
+            vm,
+            &executable,
+            &mut context_object,
+            stack,
+            heap,
+            vec![mem_region],
+            None
+        );
+        group.bench_function("jit", |b| {
+            b.iter(|| {
                 vm.context_object_pointer.remaining = instruction_meter;
-                let (instruction_count_jit, result) = vm.execute_program(&executable, false);
+                let (count, result) = vm.execute_program(&executable, false);
                 assert!(result.is_ok(), "{:?}", result);
-                assert_eq!(instruction_count_jit, instruction_meter);
-            });
-            Ok(())
-        })
-        .unwrap()
-        .unwrap();
-    println!(
-        "jit_vs_interpreter_ratio={}",
-        interpreter_summary.mean / jit_summary.mean
-    );
+                assert_eq!(count, instruction_meter);
+            })
+        });
+    }
+
+    group.finish();
 }
 
 #[cfg(all(feature = "jit", not(target_os = "windows"), target_arch = "x86_64"))]
-#[bench]
-fn bench_jit_vs_interpreter_address_translation(bencher: &mut Bencher) {
+fn bench_jit_vs_interpreter_address_translation(c: &mut Criterion) {
     bench_jit_vs_interpreter(
-        bencher,
+        c,
+        "jit_vs_interpreter_address_translation",
         "
     ldxb r0, [r1]
     add r1, 1
@@ -148,7 +157,7 @@ fn bench_jit_vs_interpreter_address_translation(bencher: &mut Bencher) {
     exit",
         Config::default(),
         655361,
-        &mut [0; 0x20000],
+        0x20000,
     );
 }
 
@@ -165,37 +174,37 @@ static ADDRESS_TRANSLATION_STACK_CODE: &str = "
     exit";
 
 #[cfg(all(feature = "jit", not(target_os = "windows"), target_arch = "x86_64"))]
-#[bench]
-fn bench_jit_vs_interpreter_address_translation_stack_fixed(bencher: &mut Bencher) {
+fn bench_jit_vs_interpreter_address_translation_stack_fixed(c: &mut Criterion) {
     bench_jit_vs_interpreter(
-        bencher,
+        c,
+        "jit_vs_interpreter_address_translation_stack_fixed",
         ADDRESS_TRANSLATION_STACK_CODE,
         Config {
             enabled_sbpf_versions: SBPFVersion::V0..=SBPFVersion::V0,
             ..Config::default()
         },
         524289,
-        &mut [],
+        0,
     );
 }
 
 #[cfg(all(feature = "jit", not(target_os = "windows"), target_arch = "x86_64"))]
-#[bench]
-fn bench_jit_vs_interpreter_address_translation_stack_dynamic(bencher: &mut Bencher) {
+fn bench_jit_vs_interpreter_address_translation_stack_dynamic(c: &mut Criterion) {
     bench_jit_vs_interpreter(
-        bencher,
+        c,
+        "jit_vs_interpreter_address_translation_stack_dynamic",
         ADDRESS_TRANSLATION_STACK_CODE,
         Config::default(),
         524289,
-        &mut [],
+        0,
     );
 }
 
 #[cfg(all(feature = "jit", not(target_os = "windows"), target_arch = "x86_64"))]
-#[bench]
-fn bench_jit_vs_interpreter_empty_for_loop(bencher: &mut Bencher) {
+fn bench_jit_vs_interpreter_empty_for_loop(c: &mut Criterion) {
     bench_jit_vs_interpreter(
-        bencher,
+        c,
+        "jit_vs_interpreter_empty_for_loop",
         "
     mov r1, r2
     and r1, 1023
@@ -204,15 +213,15 @@ fn bench_jit_vs_interpreter_empty_for_loop(bencher: &mut Bencher) {
     exit",
         Config::default(),
         262145,
-        &mut [0; 0],
+        0,
     );
 }
 
 #[cfg(all(feature = "jit", not(target_os = "windows"), target_arch = "x86_64"))]
-#[bench]
-fn bench_jit_vs_interpreter_call_depth_fixed(bencher: &mut Bencher) {
+fn bench_jit_vs_interpreter_call_depth_fixed(c: &mut Criterion) {
     bench_jit_vs_interpreter(
-        bencher,
+        c,
+        "jit_vs_interpreter_call_depth_fixed",
         "
     mov r6, 0
     add r6, 1
@@ -234,15 +243,15 @@ fn bench_jit_vs_interpreter_call_depth_fixed(bencher: &mut Bencher) {
             ..Config::default()
         },
         137218,
-        &mut [],
+        0,
     );
 }
 
 #[cfg(all(feature = "jit", not(target_os = "windows"), target_arch = "x86_64"))]
-#[bench]
-fn bench_jit_vs_interpreter_call_depth_dynamic(bencher: &mut Bencher) {
+fn bench_jit_vs_interpreter_call_depth_dynamic(c: &mut Criterion) {
     bench_jit_vs_interpreter(
-        bencher,
+        c,
+        "jit_vs_interpreter_call_depth_dynamic",
         "
     mov r6, 0
     add r6, 1
@@ -261,6 +270,22 @@ fn bench_jit_vs_interpreter_call_depth_dynamic(bencher: &mut Bencher) {
     exit",
         Config::default(),
         156674,
-        &mut [],
+        0,
     );
 }
+
+#[cfg(all(feature = "jit", not(target_os = "windows"), target_arch = "x86_64"))]
+criterion_group!(
+    benches,
+    bench_init_interpreter_start,
+    bench_init_jit_start,
+    bench_jit_vs_interpreter_address_translation,
+    bench_jit_vs_interpreter_address_translation_stack_fixed,
+    bench_jit_vs_interpreter_address_translation_stack_dynamic,
+    bench_jit_vs_interpreter_empty_for_loop,
+    bench_jit_vs_interpreter_call_depth_fixed,
+    bench_jit_vs_interpreter_call_depth_dynamic,
+);
+#[cfg(not(all(feature = "jit", not(target_os = "windows"), target_arch = "x86_64")))]
+criterion_group!(benches, bench_init_interpreter_start);
+criterion_main!(benches);

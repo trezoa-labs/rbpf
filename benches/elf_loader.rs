@@ -4,14 +4,8 @@
 // the MIT license <http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-#![feature(test)]
-
-extern crate test;
-extern crate test_utils;
-extern crate trezoa_rbpf;
-
+use criterion::{black_box, criterion_group, criterion_main, Criterion};
 use std::{fs::File, io::Read, sync::Arc};
-use test::Bencher;
 use trezoa_rbpf::{
     elf::Executable,
     program::{BuiltinFunction, BuiltinProgram, FunctionRegistry},
@@ -30,11 +24,17 @@ fn loader() -> Arc<BuiltinProgram<TestContextObject>> {
     ))
 }
 
-#[bench]
-fn bench_load_sbpfv0(bencher: &mut Bencher) {
+fn bench_load_sbpfv0(c: &mut Criterion) {
     let mut file = File::open("tests/elfs/syscall_reloc_64_32_sbpfv0.so").unwrap();
     let mut elf = Vec::new();
     file.read_to_end(&mut elf).unwrap();
     let loader = loader();
-    bencher.iter(|| Executable::<TestContextObject>::from_elf(&elf, loader.clone()).unwrap());
+    c.bench_function("load_sbpfv0", |b| {
+        b.iter(|| {
+            Executable::<TestContextObject>::from_elf(black_box(&elf), loader.clone()).unwrap()
+        })
+    });
 }
+
+criterion_group!(benches, bench_load_sbpfv0);
+criterion_main!(benches);

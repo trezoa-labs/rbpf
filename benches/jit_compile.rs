@@ -4,20 +4,14 @@
 // the MIT license <http://opensource.org/licenses/MIT>, at your option. This file may not be
 // copied, modified, or distributed except according to those terms.
 
-#![feature(test)]
-
-extern crate test;
-extern crate trezoa_rbpf;
-
+use criterion::{criterion_group, criterion_main, Criterion};
 use std::{fs::File, io::Read, sync::Arc};
-use test::Bencher;
 use test_utils::create_vm;
 use trezoa_rbpf::{
     elf::Executable, program::BuiltinProgram, verifier::RequisiteVerifier, vm::TestContextObject,
 };
 
-#[bench]
-fn bench_init_vm(bencher: &mut Bencher) {
+fn bench_init_vm(c: &mut Criterion) {
     let mut file = File::open("tests/elfs/relative_call_sbpfv0.so").unwrap();
     let mut elf = Vec::new();
     file.read_to_end(&mut elf).unwrap();
@@ -25,23 +19,24 @@ fn bench_init_vm(bencher: &mut Bencher) {
         Executable::<TestContextObject>::from_elf(&elf, Arc::new(BuiltinProgram::new_mock()))
             .unwrap();
     executable.verify::<RequisiteVerifier>().unwrap();
-    bencher.iter(|| {
-        let mut context_object = TestContextObject::default();
-        create_vm!(
-            _vm,
-            &executable,
-            &mut context_object,
-            stack,
-            heap,
-            Vec::new(),
-            None
-        );
+    c.bench_function("init_vm", |b| {
+        b.iter(|| {
+            let mut context_object = TestContextObject::default();
+            create_vm!(
+                _vm,
+                &executable,
+                &mut context_object,
+                stack,
+                heap,
+                Vec::new(),
+                None
+            );
+        })
     });
 }
 
 #[cfg(all(feature = "jit", not(target_os = "windows"), target_arch = "x86_64"))]
-#[bench]
-fn bench_jit_compile(bencher: &mut Bencher) {
+fn bench_jit_compile(c: &mut Criterion) {
     let mut file = File::open("tests/elfs/relative_call_sbpfv0.so").unwrap();
     let mut elf = Vec::new();
     file.read_to_end(&mut elf).unwrap();
@@ -49,5 +44,13 @@ fn bench_jit_compile(bencher: &mut Bencher) {
         Executable::<TestContextObject>::from_elf(&elf, Arc::new(BuiltinProgram::new_mock()))
             .unwrap();
     executable.verify::<RequisiteVerifier>().unwrap();
-    bencher.iter(|| executable.jit_compile().unwrap());
+    c.bench_function("jit_compile", |b| {
+        b.iter(|| executable.jit_compile().unwrap())
+    });
 }
+
+#[cfg(all(feature = "jit", not(target_os = "windows"), target_arch = "x86_64"))]
+criterion_group!(benches, bench_init_vm, bench_jit_compile);
+#[cfg(not(all(feature = "jit", not(target_os = "windows"), target_arch = "x86_64")))]
+criterion_group!(benches, bench_init_vm);
+criterion_main!(benches);
